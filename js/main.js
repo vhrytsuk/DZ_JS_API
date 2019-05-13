@@ -31,7 +31,7 @@ function Init(country) {
   document.querySelector("#currency").innerHTML = "";
   let url = "https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5";
   let category = ["sports", "entertainment", "health", "science", "technology"];
-  console.log("init");
+  
   Request(url, GetCurrency);
     for (let i = 0; i < category.length; i++){
         NewsRequest(category[i], country, GetNews);
@@ -79,7 +79,7 @@ function Request(url, callback) {
 }
 
 function GetCurrency(data) {
-  ///console.log("GetCurrency: ", data);
+ 
 
   let currency = document.querySelector("#currency");
 
