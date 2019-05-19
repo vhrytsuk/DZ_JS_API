@@ -23,6 +23,10 @@ function getCountry(){
   document.querySelector("#technology").innerHTML = "";
   }
 
+  if(document.querySelector("#weather")){
+    document.querySelector("#weather").innerHTML = "";
+  }
+
   var countryCod = event.target.textContent;
   Init(countryCod);
 }
@@ -30,13 +34,20 @@ function getCountry(){
 function Init(country) {
   document.querySelector("#currency").innerHTML = "";
   let url = "https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5";
+  let wetherUrl = "https://api.openweathermap.org/data/2.5/weather?q=Rivne,ua&APPID=9dbde85419e26dd00bfd93ada1d35e49";
   let category = ["sports", "entertainment", "health", "science", "technology"];
   
+
+  WeatherRequest(wetherUrl, GetWeather);
+  
   Request(url, GetCurrency);
+
     for (let i = 0; i < category.length; i++){
         NewsRequest(category[i], country, GetNews);
     }
   } 
+
+
 
   function NewsRequest(category, country, callback) {
     let url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=e67faf901e39404bae8a46818c210d1e`;
@@ -59,6 +70,7 @@ function Init(country) {
     };
   }
 
+
 function Request(url, callback) {
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url, true);
@@ -70,7 +82,26 @@ function Request(url, callback) {
     if (xhr.status != 200) {
       var errStatus = xhr.status;
       var errText = xhr.statusText;
-      console.log(errStatus + ": " + errText);
+    } else {
+      var data = JSON.parse(xhr.responseText);
+      callback(data);
+    }
+  };
+ 
+}
+
+
+function WeatherRequest(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.send();
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState != 4) return;
+
+    if (xhr.status != 200) {
+      var errStatus = xhr.status;
+      var errText = xhr.statusText;
     } else {
       var data = JSON.parse(xhr.responseText);
       callback(data);
@@ -78,11 +109,46 @@ function Request(url, callback) {
   };
 }
 
+function GetWeather(data){
+  let weather = document.querySelector("#weather");
+    let city = document.createElement("div");
+    city.className = "city";
+    city.innerHTML +="Місто : "+ data.name;
+    weather.appendChild(city);
+
+    let cloudiness = document.createElement("div");
+    cloudiness.className = "cloudiness";
+    cloudiness.innerHTML +='<img src="https://openweathermap.org/img/w/' + data.weather[0].icon +'.png">' + data.weather[0].main; 
+    weather.appendChild(cloudiness);
+
+    let main = document.createElement("div");
+    main.className = "main";
+    main.innerHTML +="Температура <b>" +Math.round(data.main.temp-275) + "&#176;C</b><br>" ;
+    weather.appendChild(main);
+
+    let humidity = document.createElement("div");
+    humidity.className = "humidity";
+    humidity.innerHTML +='Вологість :' + data.main.humidity+'%';
+    weather.appendChild(humidity);
+
+    let pressure = document.createElement("div");
+    pressure.className = "pressure";
+    pressure.innerHTML +="Тиск :" + data.main.pressure + " мм.рт.ст";
+    weather.appendChild(pressure); 
+
+    let visibility = document.createElement("div");
+    visibility.className = "visibility";
+    visibility.innerHTML += "Видимість :" + (data.visibility/1000) + " км";
+    weather.appendChild(visibility);
+
+    
+    console.log(data);
+}
+
+
+
 function GetCurrency(data) {
- 
-
   let currency = document.querySelector("#currency");
-
   for (let i = 0; i < data.length; i++) {
     let ccy = document.createElement("div");
     ccy.className = "ccy";
@@ -102,6 +168,7 @@ function GetCurrency(data) {
     currency.appendChild(sale);
     //console.log(data[i].ccy, " ", data[i].base_ccy, " buy: ", data[i].buy, " sale: ", data[i].sale);
   }
+  
 }
 
 function GetNews(category, data) {

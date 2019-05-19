@@ -299,3 +299,18 @@ body {
 .country:hover{
     color: #FF652F;
 }
+#weather{
+    color: #EEE2DC;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  
+}
+#weather div{
+    padding: 6pt;
+    border: 1px solid white;
+    width: 150pt;
+    letter-spacing:2px;
+    
+   
+}
